@@ -10,7 +10,7 @@ Docker image for `rTASSEL`. Contains the following:
     + `rlang`
     + `tidyverse`
     + `vctrs`
-  + Bioconductor packages
+  + Bioconductor packages:
     + `BiocStyle`
     + `AnnotationDbi`
     + `GenomicFeatures`
@@ -18,4 +18,6 @@ Docker image for `rTASSEL`. Contains the following:
     + `IRanges`
     + `S4Vectors`
     + `SummarizedExperiment`
+
+
 

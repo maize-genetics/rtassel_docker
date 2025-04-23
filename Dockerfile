@@ -2,6 +2,9 @@
 
 FROM rocker/rstudio:4.3.1
 
+# Allow overriding RStudio Server port via build arg
+ARG RSTUDIO_PORT=8787
+
 # Install OS-level dependencies including git
 RUN apt-get update && apt-get install -y --no-install-recommends \
     default-jdk \
@@ -13,6 +16,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Set JAVA_HOME for rJava
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+
+# Configure RStudio Server to listen on the specified port
+RUN echo "www-port=${RSTUDIO_PORT}" >> /etc/rstudio/rserver.conf
 
 # Define package lists
 ARG CRAN_PACKAGES="rJava,tidyverse,ape,cli,ggplot2,plotly,rlang,tibble,vctrs,knitr,magrittr,rmarkdown,testthat"
@@ -27,5 +33,8 @@ RUN Rscript -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.pack
 # Install rTASSEL from GitHub
 RUN Rscript -e "if (!requireNamespace('remotes', quietly=TRUE)) install.packages('remotes', repos='https://cloud.r-project.org'); remotes::install_github('maize-genetics/rTASSEL')"
 
-# Expose RStudio Server port
-EXPOSE 8787
+# Expose the configured port
+EXPOSE ${RSTUDIO_PORT}
+
+
+
