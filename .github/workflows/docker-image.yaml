@@ -30,6 +30,6 @@ jobs:
           file: Dockerfile
           push: true
           tags: |
-            maize-genetics/rtassel-docker:latest
-            maize-genetics/rtassel-docker:${{ github.sha }}
+            maizegenetics/rtassel-docker:latest
+            maizegenetics/rtassel-docker:${{ github.sha }}
 
