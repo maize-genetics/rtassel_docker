@@ -1,40 +1,21 @@
-### Dockerfile for rTASSEL
+# Pull from rocker project
+FROM rocker/verse:4.4
 
-FROM rocker/rstudio:4.3.1
+# Install system libraries for Java, rJava, Git, and XML/SSL support
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      default-jdk \
+      git \
+      libcurl4-openssl-dev \
+      libssl-dev \
+      libxml2-dev && \
+    rm -rf /var/lib/apt/lists/*
 
-# Allow overriding RStudio Server port via build arg
-ARG RSTUDIO_PORT=8787
+# Ensure JAVA_HOME is set for rJava
+ENV JAVA_HOME=/usr/lib/jvm/default-java
 
-# Install OS-level dependencies including git
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    default-jdk \
-    git \
-    libssl-dev \
-    libcurl4-openssl-dev \
-    libxml2-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Install pak
+RUN R -e "install.packages('pak')"
 
-# Set JAVA_HOME for rJava
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-
-# Configure RStudio Server to listen on the specified port
-RUN echo "www-port=${RSTUDIO_PORT}" >> /etc/rstudio/rserver.conf
-
-# Define package lists
-ARG CRAN_PACKAGES="rJava,tidyverse,ape,cli,ggplot2,plotly,rlang,tibble,vctrs,knitr,magrittr,rmarkdown,testthat"
-ARG BIOC_PACKAGES="GenomicFeatures,AnnotationDbi,GenomicRanges,IRanges,S4Vectors,SummarizedExperiment,BiocStyle"
-
-# Install CRAN packages
-RUN Rscript -e "install.packages(strsplit(Sys.getenv('CRAN_PACKAGES'), ',')[[1]], repos='https://cloud.r-project.org')"
-
-# Install Bioconductor packages
-RUN Rscript -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('BiocManager', repos='https://cloud.r-project.org'); BiocManager::install(strsplit(Sys.getenv('BIOC_PACKAGES'), ',')[[1]])"
-
-# Install rTASSEL from GitHub
-RUN Rscript -e "if (!requireNamespace('remotes', quietly=TRUE)) install.packages('remotes', repos='https://cloud.r-project.org'); remotes::install_github('maize-genetics/rTASSEL')"
-
-# Expose the configured port
-EXPOSE ${RSTUDIO_PORT}
-
-
-
+# Install rTASSEL
+RUN R -e "pak::pak('maize-genetics/rTASSEL@v0.10.0')"
