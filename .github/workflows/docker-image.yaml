@@ -23,13 +23,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Publish to Docker Hub
         uses: docker/build-push-action@v3
         with:
-          context: .
-          file: Dockerfile
-          push: true
-          tags: |
-            maizegenetics/rtassel_docker:latest
-            maizegenetics/rtassel_docker:${{ github.sha }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: maizegenetics/rtassel_docker
+          tags: latest, ${{ github.run_number }}
 
